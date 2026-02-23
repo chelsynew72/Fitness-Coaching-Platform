@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type UserDocument = User & Document;
+export type UserDocument = User & Document & { id: string };
 
 export enum UserRole {
   COACH = 'coach',
@@ -27,13 +27,13 @@ export class User {
   avatar: string;
 
   @Prop({ default: false })
-  isApproved: boolean; // coaches need admin approval
+  isApproved: boolean;
 
   @Prop({ default: true })
   isActive: boolean;
 
   @Prop()
-  refreshToken: string; // hashed refresh token stored here
+  refreshToken: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

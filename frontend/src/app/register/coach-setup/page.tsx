@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, Dumbbell, Wallet, FileText, Zap, ArrowRight, Activity } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const SPECIALTIES = [
   "Hypertrophy", "HIIT", "Yoga", "Powerlifting", "Weight Loss", "Nutrition", "Mobility", "Cardio"
@@ -12,6 +13,14 @@ export default function CoachSetup() {
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>(["Hypertrophy", "Yoga"]);
   const [rate, setRate] = useState("149");
   const [bio, setBio] = useState("I am a dedicated fitness professional with over 8 years of experience in high-performance hypertrophy training and nutritional optimization. My approach combines scientific data with practical intensity to help clients shatter plateaus. I believe in sustainable lifestyle shifts rather than quick fixes.");
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+    }
+  }, [router]);
 
   const toggleSpecialty = (specialty: string) => {
     if (selectedSpecialties.includes(specialty)) {
@@ -23,7 +32,7 @@ export default function CoachSetup() {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch("http://localhost:3001/coaches/profile", {
+      const response = await fetch("http://localhost:4000/api/coaches/profile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

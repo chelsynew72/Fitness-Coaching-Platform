@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronDown, BarChart3, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -11,9 +11,16 @@ export default function AthleteSetup() {
   const [targetWeight, setTargetWeight] = useState("00.0");
   const router = useRouter();
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+    }
+  }, [router]);
+
   const handleSubmit = async () => {
     try {
-      const response = await fetch("http://localhost:3001/clients/profile", {
+      const response = await fetch("http://localhost:4000/api/clients/profile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

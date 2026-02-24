@@ -88,8 +88,8 @@ export default function ChoosePath() {
       </div>
 
       <div className="mt-auto pt-12">
-        <Link href={role === "coach" ? "/register/coach-setup" : "/register/athlete-setup"}>
-          <button className="h-16 w-full bg-primary font-black uppercase tracking-widest text-black">
+        <Link href={`/register?role=${role === "coach" ? "coach" : "client"}`}>
+          <button className="h-16 w-full bg-primary font-black uppercase tracking-widest text-black shadow-[0_4px_14px_0_rgba(204,255,0,0.39)] hover:opacity-90 transition-opacity">
             Continue
           </button>
         </Link>

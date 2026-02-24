@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Search, Menu, ArrowRight, User, Star, Activity, Trophy, Check, Instagram, Twitter, Youtube, Home as HomeIcon, Dumbbell, BarChart3, UserCircle } from "lucide-react";
 
 export default function Home() {
@@ -43,9 +44,11 @@ export default function Home() {
               The premium data-driven platform connecting elite trainers with peak athletes.
             </p>
             <div className="flex w-full flex-col gap-3 sm:flex-row">
-              <button className="flex h-14 w-full items-center justify-center gap-2 bg-primary font-bold text-black transition-transform hover:scale-[1.02] active:scale-[0.98]">
-                START TRANSFORMATION <ArrowRight className="h-5 w-5" />
-              </button>
+              <Link href="/register/path" className="w-full">
+                <button className="flex h-14 w-full items-center justify-center gap-2 bg-primary font-bold text-black transition-transform hover:scale-[1.02] active:scale-[0.98]">
+                  START TRANSFORMATION <ArrowRight className="h-5 w-5" />
+                </button>
+              </Link>
               <button className="h-14 w-full border border-white/20 bg-white/5 font-bold backdrop-blur-sm transition-transform hover:scale-[1.02] active:scale-[0.98]">
                 EXPLORE COACHES
               </button>
@@ -202,9 +205,11 @@ export default function Home() {
                     <div className="h-4 w-4 border border-zinc-800 rounded-sm" /> <span>1-on-1 Video Coaching</span>
                   </li>
                 </ul>
-                <button className="mt-auto border border-white/20 py-4 text-xs font-black uppercase tracking-widest hover:bg-white/5 transition-colors">
-                  Select Standard
-                </button>
+                <Link href="/register/path">
+                  <button className="mt-auto w-full border border-white/20 py-4 text-xs font-black uppercase tracking-widest hover:bg-white/5 transition-colors">
+                    Select Standard
+                  </button>
+                </Link>
               </div>
 
               {/* Elite */}
@@ -231,9 +236,11 @@ export default function Home() {
                     <Check className="h-4 w-4 text-primary" /> <span>Bloodwork Analysis Integration</span>
                   </li>
                 </ul>
-                <button className="mt-auto bg-primary py-4 text-xs font-black uppercase tracking-widest text-black hover:opacity-90 transition-opacity">
-                  Select Elite
-                </button>
+                <Link href="/register/path">
+                  <button className="mt-auto w-full bg-primary py-4 text-xs font-black uppercase tracking-widest text-black hover:opacity-90 transition-opacity">
+                    Select Elite
+                  </button>
+                </Link>
               </div>
             </div>
           </div>

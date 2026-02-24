@@ -10,6 +10,7 @@ import { PlansModule } from './plans/plans.module';
 import { WorkoutLogsModule } from './workout-logs/workout-logs.module';
 import { ProgressModule } from './progress/progress.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
     WorkoutLogsModule,
     ProgressModule,
     SubscriptionsModule,
+    ChatModule,
   ],
 })
 export class AppModule {}

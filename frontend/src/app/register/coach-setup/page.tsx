@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft, Dumbbell, Wallet, FileText, Zap, ArrowRight, Activity } from "lucide-react";
+import { ChevronLeft, Wallet, FileText, Zap, ArrowRight, Activity } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 const SPECIALTIES = [
   "Hypertrophy", "HIIT", "Yoga", "Powerlifting", "Weight Loss", "Nutrition", "Mobility", "Cardio"
@@ -14,13 +15,13 @@ export default function CoachSetup() {
   const [rate, setRate] = useState("149");
   const [bio, setBio] = useState("I am a dedicated fitness professional with over 8 years of experience in high-performance hypertrophy training and nutritional optimization. My approach combines scientific data with practical intensity to help clients shatter plateaus. I believe in sustainable lifestyle shifts rather than quick fixes.");
   const router = useRouter();
+  const { token, isLoading } = useAuth();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (!isLoading && !token) {
       router.push("/login");
     }
-  }, [router]);
+  }, [token, isLoading, router]);
 
   const toggleSpecialty = (specialty: string) => {
     if (selectedSpecialties.includes(specialty)) {
@@ -36,7 +37,7 @@ export default function CoachSetup() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}` // Assuming token is stored in localStorage
+          "Authorization": `Bearer ${token}` // Assuming token is stored in localStorage
         },
         body: JSON.stringify({
           bio,

@@ -1,8 +1,30 @@
+"use client";
+
+import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Search, Menu, ArrowRight, User, Star, Activity, Trophy, Check, Instagram, Twitter, Youtube, Home as HomeIcon, Dumbbell, BarChart3, UserCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Search, Menu, ArrowRight, Star, Activity, Check, Instagram, Twitter, Youtube, Home as HomeIcon, Dumbbell, BarChart3, UserCircle } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
+  const { user, token, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && token && user) {
+      if (user.role === "coach") {
+        router.push("/dashboard/coach");
+      } else if (user.role === "client") {
+        router.push("/dashboard/athlete");
+      }
+    }
+  }, [user, token, isLoading, router]);
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-black" />;
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-black text-white font-sans">
       {/* Header */}
@@ -65,7 +87,7 @@ export default function Home() {
             <div className="space-y-12">
               <div className="flex items-start gap-6">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center bg-zinc-900 border border-primary/20">
-                  <User className="h-6 w-6 text-primary" />
+                  <UserCircle className="h-6 w-6 text-primary" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold uppercase">Match with a Pro</h3>
@@ -89,7 +111,7 @@ export default function Home() {
 
               <div className="flex items-start gap-6">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center bg-zinc-900 border border-primary/20">
-                  <Trophy className="h-6 w-6 text-primary" />
+                  <Star className="h-6 w-6 text-primary" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold uppercase">Get Elite Results</h3>

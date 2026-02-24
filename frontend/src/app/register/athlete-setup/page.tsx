@@ -4,19 +4,20 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronDown, BarChart3, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AthleteSetup() {
   const [goal, setGoal] = useState("");
   const [currentWeight, setCurrentWeight] = useState("00.0");
   const [targetWeight, setTargetWeight] = useState("00.0");
   const router = useRouter();
+  const { token, isLoading } = useAuth();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (!isLoading && !token) {
       router.push("/login");
     }
-  }, [router]);
+  }, [token, isLoading, router]);
 
   const handleSubmit = async () => {
     try {
@@ -24,7 +25,7 @@ export default function AthleteSetup() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
           goals: [goal],

@@ -11,6 +11,7 @@ import { WorkoutLogsModule } from './workout-logs/workout-logs.module';
 import { ProgressModule } from './progress/progress.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { ChatModule } from './chat/chat.module';
+import { NutritionModule } from './nutrition/nutrition.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ChatModule } from './chat/chat.module';
     ProgressModule,
     SubscriptionsModule,
     ChatModule,
+    NutritionModule,
   ],
 })
 export class AppModule {}

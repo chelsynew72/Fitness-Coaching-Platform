@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { Eye, EyeOff, Activity, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 function RegisterContent() {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,6 +13,7 @@ function RegisterContent() {
   const [password, setPassword] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { login } = useAuth();
   const role = (searchParams.get("role") || "client").toLowerCase(); // Ensure lowercase for backend enum
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -25,7 +27,7 @@ function RegisterContent() {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem("token", data.accessToken);
+        login(data.accessToken, data.user);
         alert("Registration successful!");
         
         // Navigate based on role

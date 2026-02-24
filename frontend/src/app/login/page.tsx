@@ -4,12 +4,14 @@ import { useState } from "react";
 import { Eye, EyeOff, Activity } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,9 +24,16 @@ export default function Login() {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem("token", data.accessToken);
-        alert("Login successful!");
-        router.push("/");
+        login(data.accessToken, data.user);
+        
+        // Role-based redirection
+        if (data.user.role === "coach") {
+          router.push("/dashboard/coach");
+        } else if (data.user.role === "client") {
+          router.push("/dashboard/athlete");
+        } else {
+          router.push("/");
+        }
       } else {
         const error = await response.json();
         alert(`Login failed: ${error.message}`);
@@ -119,7 +128,7 @@ export default function Login() {
       </div>
 
       <p className="mt-8 text-center text-sm text-zinc-500">
-        Don't have an account?{" "}
+        Don&apos;t have an account?{" "}
         <Link href="/register/path" className="font-bold text-primary hover:underline">
           Create an Account
         </Link>

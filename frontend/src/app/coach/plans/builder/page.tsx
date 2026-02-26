@@ -274,10 +274,10 @@ function BuilderContent() {
         </div>
       </div>
 
-      <div className="flex h-[calc(100vh-65px)]">
+      <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-65px)]">
 
         {/* Left Panel — Plan Settings + Week/Day Navigation */}
-        <div className="w-64 border-r border-white/5 flex flex-col overflow-y-auto">
+        <div className="w-full lg:w-64 border-r border-white/5 flex flex-col overflow-y-auto">
 
           {/* Plan Settings */}
           <div className="p-4 border-b border-white/5 space-y-3">
@@ -441,7 +441,7 @@ function BuilderContent() {
 
                         <div className="p-4 space-y-3">
                           {/* Name + Muscle Group */}
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <div>
                               <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 block mb-1.5">
                                 Exercise Name
@@ -472,7 +472,7 @@ function BuilderContent() {
                           </div>
 
                           {/* Sets, Reps, Weight, Rest */}
-                          <div className="grid grid-cols-4 gap-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:grid-cols-4">
                             {[
                               { label: "Sets", field: "sets", min: 1, max: 10 },
                               { label: "Reps", field: "reps", min: 1, max: 100 },

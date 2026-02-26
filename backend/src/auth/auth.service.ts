@@ -7,6 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import * as admin from 'firebase-admin';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -18,19 +19,31 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
-  ) {}
+  ) {
+    // Initialize Firebase Admin if not already initialized
+    if (!admin.apps.length) {
+      const privateKey = this.configService.get<string>('FIREBASE_PRIVATE_KEY');
+      const clientEmail = this.configService.get<string>('FIREBASE_CLIENT_EMAIL');
+      
+      if (privateKey && clientEmail) {
+        admin.initializeApp({
+          credential: admin.credential.cert({
+            projectId: 'fitpro-platform',
+            clientEmail,
+            privateKey: privateKey.replace(/\\n/g, '\n'),
+          }),
+        });
+      }
+    }
+  }
 
   async register(dto: RegisterDto) {
-    // check if email already exists
     const existing = await this.usersService.findByEmail(dto.email);
     if (existing) {
       throw new ConflictException('Email already in use');
     }
 
-    // hash password
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-
-    // coaches start as unapproved, clients and admins are approved immediately
     const isApproved = dto.role !== UserRole.COACH;
 
     const user = await this.usersService.create({
@@ -70,9 +83,7 @@ export class AuthService {
     }
 
     if (user.role === UserRole.COACH && !user.isApproved) {
-      throw new ForbiddenException(
-        'Your coach account is pending admin approval',
-      );
+      throw new ForbiddenException('Your coach account is pending admin approval');
     }
 
     const tokens = await this.generateTokens(user);
@@ -81,6 +92,59 @@ export class AuthService {
     return {
       user: this.sanitizeUser(user),
       ...tokens,
+    };
+  }
+
+  async firebaseLogin(idToken: string, role?: string) {
+    let firebaseUser: admin.auth.DecodedIdToken;
+
+    try {
+      firebaseUser = await admin.auth().verifyIdToken(idToken);
+    } catch {
+      throw new UnauthorizedException('Invalid Firebase token');
+    }
+
+    const { email, name, picture, uid } = firebaseUser;
+
+    if (!email) {
+      throw new UnauthorizedException('No email found in Firebase token');
+    }
+
+    // find or create user
+    let user = await this.usersService.findByEmail(email);
+    let isNewUser = false;
+
+    if (!user) {
+      isNewUser = true;
+      const userRole = (role as UserRole) || UserRole.CLIENT;
+      const isApproved = userRole !== UserRole.COACH;
+
+      user = await this.usersService.create({
+        name: name || email.split('@')[0],
+        email,
+        password: await bcrypt.hash(uid, 10),
+        role: userRole,
+        avatar: picture || '',
+        isApproved,
+        isActive: true,
+      });
+    }
+
+    if (!user.isActive) {
+      throw new ForbiddenException('Your account has been suspended');
+    }
+
+    if (user.role === UserRole.COACH && !user.isApproved) {
+      throw new ForbiddenException('Your coach account is pending admin approval');
+    }
+
+    const tokens = await this.generateTokens(user);
+    await this.storeRefreshToken(user._id.toString(), tokens.refreshToken);
+
+    return {
+      user: this.sanitizeUser(user),
+      ...tokens,
+      isNewUser,
     };
   }
 
@@ -98,8 +162,6 @@ export class AuthService {
   async getMe(user: UserDocument) {
     return this.sanitizeUser(user);
   }
-
-  // ─── helpers ─────────────────────────────────────────────
 
   private async generateTokens(user: UserDocument) {
     const payload = {

@@ -79,7 +79,7 @@ export default function AdminCoaches() {
 
   return (
     <div className="flex min-h-screen bg-black text-white font-sans">
-      <aside className="w-56 shrink-0 border-r border-white/5 flex flex-col py-8 px-4 sticky top-0 h-screen">
+      <aside className="hidden lg:flex w-56 shrink-0 border-r border-white/5 flex-col py-8 px-4 sticky top-0 h-screen">
         <div className="px-2 mb-2">
           <span className="text-xl font-black uppercase tracking-tighter">FIT<span className="text-primary">PRO</span></span>
         </div>
@@ -111,10 +111,10 @@ export default function AdminCoaches() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto p-8">
+      <main className="flex-1 overflow-y-auto p-4 pt-20 lg:p-8">
         <div className="mb-8">
           <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1">Manage</p>
-          <h1 className="text-3xl font-black uppercase tracking-tighter">Coaches</h1>
+          <h1 className="text-2xl lg:text-3xl font-black uppercase tracking-tighter">Coaches</h1>
         </div>
 
         {/* Pending Approvals */}

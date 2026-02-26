@@ -100,7 +100,7 @@ export default function BillingPage() {
     <div className="flex min-h-screen bg-black text-white font-sans">
 
       {/* Sidebar */}
-      <aside className="w-56 shrink-0 border-r border-white/5 flex flex-col py-8 px-4 sticky top-0 h-screen">
+      <aside className="hidden lg:flex w-56 shrink-0 border-r border-white/5 flex-col py-8 px-4 sticky top-0 h-screen">
         <div className="px-2 mb-10">
           <span className="text-xl font-black uppercase tracking-tighter">
             FIT<span className="text-primary">PRO</span>
@@ -143,15 +143,15 @@ export default function BillingPage() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 overflow-y-auto p-8">
+      <main className="flex-1 overflow-y-auto p-4 pt-20 lg:p-8">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 lg:mb-8">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1">
               Subscription & Payments
             </p>
-            <h1 className="text-3xl font-black uppercase tracking-tighter">Billing</h1>
+            <h1 className="text-2xl lg:text-3xl font-black uppercase tracking-tighter">Billing</h1>
           </div>
         </div>
 
@@ -192,7 +192,7 @@ export default function BillingPage() {
               </div>
 
               {/* Billing Details Grid */}
-              <div className="grid grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4 mb-6">
                 {[
                   { label: "Monthly Amount", value: `$${subscription.amount}`, sub: subscription.currency?.toUpperCase() },
                   { label: "Billing Cycle", value: "Monthly", sub: "30 days" },
@@ -254,14 +254,14 @@ export default function BillingPage() {
               {subscription.paymentHistory?.length > 0 ? (
                 <div className="space-y-2">
                   {/* Header */}
-                  <div className="grid grid-cols-4 gap-4 px-4 py-2">
+                  <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4 px-4 py-2">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Date</span>
                     <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Invoice</span>
                     <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 text-right">Amount</span>
                     <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 text-right">Status</span>
                   </div>
                   {subscription.paymentHistory.map((payment: any, i: number) => (
-                    <div key={i} className="grid grid-cols-4 gap-4 items-center bg-zinc-900 rounded-lg px-4 py-3">
+                    <div key={i} className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4 items-center bg-zinc-900 rounded-lg px-4 py-3">
                       <span className="text-sm text-zinc-400">
                         {new Date(payment.date).toLocaleDateString()}
                       </span>

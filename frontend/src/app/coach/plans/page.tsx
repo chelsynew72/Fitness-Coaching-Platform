@@ -116,7 +116,7 @@ export default function CoachPlans() {
     <div className="flex min-h-screen bg-black text-white font-sans">
 
       {/* Sidebar */}
-      <aside className="w-56 shrink-0 border-r border-white/5 flex flex-col py-8 px-4 sticky top-0 h-screen">
+      <aside className="hidden lg:flex w-56 shrink-0 border-r border-white/5 flex-col py-8 px-4 sticky top-0 h-screen">
         <div className="px-2 mb-10">
           <span className="text-xl font-black uppercase tracking-tighter">
             FIT<span className="text-primary">PRO</span>
@@ -159,15 +159,15 @@ export default function CoachPlans() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 overflow-y-auto p-8">
+      <main className="flex-1 overflow-y-auto p-4 pt-20 lg:p-8">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 lg:mb-8">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1">
               Workout Templates
             </p>
-            <h1 className="text-3xl font-black uppercase tracking-tighter">Plans</h1>
+            <h1 className="text-2xl lg:text-3xl font-black uppercase tracking-tighter">Plans</h1>
           </div>
           <div className="flex items-center gap-3">
             {success && (
@@ -195,7 +195,7 @@ export default function CoachPlans() {
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4 mb-6">
           {[
             { label: "Total Templates", value: plans.length, icon: Dumbbell },
             { label: "Active Clients", value: clients.length, icon: Users },
@@ -219,13 +219,13 @@ export default function CoachPlans() {
 
         {/* Plans Grid */}
         {loading ? (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             {[1, 2, 3, 4].map(i => (
               <div key={i} className="h-56 bg-zinc-950 border border-white/5 rounded-xl shimmer" />
             ))}
           </div>
         ) : filtered.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             {filtered.map((plan, i) => (
               <div key={i} className="bg-zinc-950 border border-white/5 rounded-xl overflow-hidden hover:border-white/10 transition-colors">
 

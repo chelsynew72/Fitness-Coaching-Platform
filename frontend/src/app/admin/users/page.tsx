@@ -91,7 +91,7 @@ export default function AdminUsers() {
 
   return (
     <div className="flex min-h-screen bg-black text-white font-sans">
-      <aside className="w-56 shrink-0 border-r border-white/5 flex flex-col py-8 px-4 sticky top-0 h-screen">
+      <aside className="hidden lg:flex w-56 shrink-0 border-r border-white/5 flex-col py-8 px-4 sticky top-0 h-screen">
         <div className="px-2 mb-2">
           <span className="text-xl font-black uppercase tracking-tighter">FIT<span className="text-primary">PRO</span></span>
         </div>
@@ -123,11 +123,11 @@ export default function AdminUsers() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto p-8">
-        <div className="flex items-center justify-between mb-8">
+      <main className="flex-1 overflow-y-auto p-4 pt-20 lg:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 lg:mb-8">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1">Manage</p>
-            <h1 className="text-3xl font-black uppercase tracking-tighter">All Users</h1>
+            <h1 className="text-2xl lg:text-3xl font-black uppercase tracking-tighter">All Users</h1>
           </div>
           <div className="flex items-center gap-3">
             <div className="relative">

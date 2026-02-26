@@ -46,13 +46,14 @@ export default function Login() {
     const role = data.user.role;
     console.log("Logged in as:", role);
 
-    if (role === "coach") {
-      window.location.href = "/coach/dashboard";
-    } else if (role === "client") {
-      window.location.href = "/client/dashboard";
-    } else {
-      window.location.href = "/";
-    }
+  // find this section and update it
+if (data.user.role === "coach") {
+  window.location.href = "/coach/dashboard";
+} else if (data.user.role === "admin") {
+  window.location.href = "/admin/dashboard";
+} else {
+  window.location.href = "/client/dashboard";
+}
   } catch (err) {
     console.error("Login error:", err);
     setError("Cannot connect to server. Is the backend running?");

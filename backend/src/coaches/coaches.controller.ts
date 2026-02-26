@@ -18,28 +18,30 @@ import type { UserDocument } from '../users/schemas/user.schema';
 import { UserRole } from '../users/schemas/user.schema';
 
 @Controller('coaches')
-@UseGuards(JwtAuthGuard, RolesGuard)
 export class CoachesController {
   constructor(private coachesService: CoachesService) {}
 
-  // public — all logged in users can browse coaches
+  // PUBLIC — no auth required
   @Get()
   getAllCoaches() {
     return this.coachesService.getAllCoaches();
   }
 
-  @Get('profile')
-  @Roles(UserRole.COACH)
-  getMyProfile(@CurrentUser() user: UserDocument) {
-    return this.coachesService.getProfile(user._id.toString());
-  }
-
+  // PUBLIC — no auth required
   @Get(':id')
   getCoachById(@Param('id') id: string) {
     return this.coachesService.getProfileById(id);
   }
 
+  @Get('profile')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.COACH)
+  getMyProfile(@CurrentUser() user: UserDocument) {
+    return this.coachesService.getProfile(user._id.toString());
+  }
+
   @Post('profile')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COACH)
   createProfile(
     @CurrentUser() user: UserDocument,
@@ -49,6 +51,7 @@ export class CoachesController {
   }
 
   @Patch('profile')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COACH)
   updateProfile(
     @CurrentUser() user: UserDocument,
@@ -58,6 +61,7 @@ export class CoachesController {
   }
 
   @Get('my-clients')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COACH)
   getMyClients(@CurrentUser() user: UserDocument) {
     return this.coachesService.getCoachClients(user._id.toString());

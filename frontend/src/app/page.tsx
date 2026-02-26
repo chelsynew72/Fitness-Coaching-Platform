@@ -11,15 +11,15 @@ export default function Home() {
   const { user, token, isLoading } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!isLoading && token && user) {
-      if (user.role === "coach") {
-        router.push("/dashboard/coach");
-      } else if (user.role === "client") {
-        router.push("/dashboard/athlete");
-      }
+ useEffect(() => {
+  if (!isLoading && token && user) {
+    if (user.role === "coach") {
+      router.push("/coach/dashboard");  // ← fix
+    } else if (user.role === "client") {
+      router.push("/client/dashboard");  // ← fix
     }
-  }, [user, token, isLoading, router]);
+  }
+}, [user, token, isLoading, router]);
 
   if (isLoading) {
     return <div className="min-h-screen bg-black" />;
@@ -297,7 +297,7 @@ export default function Home() {
       </footer>
 
       {/* Bottom Nav Mobile */}
-      <nav className="fixed bottom-0 z-50 flex w-full items-center justify-around border-t border-white/10 bg-black/80 py-4 backdrop-blur-lg">
+    <nav className="fixed bottom-0 z-50 flex w-full items-center justify-around border-t border-white/10 bg-black/80 py-4 backdrop-blur-lg md:hidden">
         <div className="flex flex-col items-center gap-1 text-primary">
           <HomeIcon className="h-6 w-6" />
           <span className="text-[8px] font-bold uppercase">Home</span>

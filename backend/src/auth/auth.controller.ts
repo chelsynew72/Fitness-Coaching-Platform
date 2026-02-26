@@ -30,6 +30,12 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
+  @Post('firebase')
+  @HttpCode(HttpStatus.OK)
+  firebaseLogin(@Body() body: { idToken: string; role?: string }) {
+    return this.authService.firebaseLogin(body.idToken, body.role);
+  }
+
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)

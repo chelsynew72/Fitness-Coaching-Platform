@@ -109,7 +109,7 @@ function BuilderContent() {
     if (!title.trim()) { alert("Plan title is required."); return; }
     setSaving(true);
     try {
-      const payload = { title, description, goal, durationWeeks, weeks, isTemplate: true };
+      const payload = { title, description, goal, durationWeeks, weeks };
       const url = editId
         ? `${API}/api/plans/templates/${editId}`
         : `${API}/api/plans/templates`;

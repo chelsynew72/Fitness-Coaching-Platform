@@ -45,7 +45,7 @@ export default function MyPlan() {
         get("/chat/unread/count"),
       ]);
       if (p.status === "fulfilled") setPlan(p.value);
-      else setError("No plan assigned yet. Ask your coach to assign you a plan.");
+      else setError("Plan Pending. Ask your coach to assign you a plan.");
       if (u.status === "fulfilled") setUnread(u.value);
     } finally {
       setLoading(false);
@@ -155,9 +155,16 @@ export default function MyPlan() {
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="text-5xl mb-4">📋</div>
-            <h2 className="text-xl font-black uppercase tracking-tighter mb-2">No Plan Yet</h2>
-            <p className="text-zinc-500 text-sm max-w-sm">{error}</p>
+            <div className="text-6xl mb-6">⏳</div>
+            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              Plan Pending
+            </div>
+            <h2 className="text-xl font-black uppercase tracking-tighter mb-2">Your Plan Is Being Prepared</h2>
+            <p className="text-zinc-500 text-sm max-w-sm mb-6">Your coach has been notified and is working on your personalised plan. Check your messages for updates.</p>
+            <a href="/client/chat" className="inline-flex items-center gap-2 bg-primary text-black text-xs font-black uppercase tracking-widest px-4 py-2.5 hover:opacity-90 transition-opacity">
+              💬 Message Your Coach
+            </a>
           </div>
         ) : plan ? (
           <>

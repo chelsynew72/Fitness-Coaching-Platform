@@ -21,7 +21,8 @@ export default function AthleteSetup() {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch("http://localhost:4000/api/clients/profile", {
+      const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+      const response = await fetch(`${API}/api/clients/profile`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

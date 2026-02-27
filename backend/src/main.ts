@@ -7,14 +7,20 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,        // strip unknown fields
+      whitelist: true,
       forbidNonWhitelisted: true,
-      transform: true,        // auto transform types
+      transform: true,
     }),
   );
 
   app.enableCors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://fitness-coaching-platform-frontend.vercel.app',
+      'https://fitness-coaching-platform-frontend-alwylfmtu.vercel.app',
+      process.env.CLIENT_URL,
+    ].filter(Boolean),
     credentials: true,
   });
 

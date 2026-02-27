@@ -50,9 +50,10 @@ export default function Login() {
   e.preventDefault();
   setError("");
   setLoading(true);
+  const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
   try {
-    const response = await fetch("http://localhost:4000/api/auth/login", {
+    const response = await fetch(`${API}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),

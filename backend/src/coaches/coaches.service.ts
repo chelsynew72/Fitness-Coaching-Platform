@@ -83,10 +83,17 @@ export class CoachesService {
 
   async getCoachClients(userId: string) {
     const coach = await this.coachModel
-      .findOne({ userId: new Types.ObjectId(userId) })
-      .populate('clients', 'name email avatar');
+      .findOne({ userId: new Types.ObjectId(userId) });
 
     if (!coach) throw new NotFoundException('Coach profile not found');
-    return coach.clients;
+    
+    // populate manually to avoid cast errors
+    const User = this.coachModel.db.model('User');
+    const clients = await User.find(
+      { _id: { $in: coach.clients } },
+      'name email avatar role isActive'
+    );
+    
+    return clients;
   }
 }

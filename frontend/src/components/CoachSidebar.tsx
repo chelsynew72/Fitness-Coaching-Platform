@@ -44,7 +44,7 @@ export default function CoachSidebar({ active, unread = 0 }: Props) {
             }`}>
             <item.icon className="h-4 w-4" />
             {item.label}
-            {item.badge > 0 && (
+            {(item.badge ?? 0) > 0 && (
               <span className="ml-auto bg-primary text-black text-[10px] font-black px-1.5 py-0.5 rounded-full">
                 {item.badge}
               </span>

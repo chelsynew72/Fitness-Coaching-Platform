@@ -14,11 +14,13 @@ import {
   SubscriptionStatus,
 } from './schemas/subscription.schema';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
+import { ChatService } from '../chat/chat.service';
 import { Coach, CoachDocument } from '../coaches/schemas/coach.schema';
 
 @Injectable()
 export class SubscriptionsService {
   constructor(
+    private chatService: ChatService,
     @InjectModel(Subscription.name)
     private subscriptionModel: Model<SubscriptionDocument>,
     @InjectModel(Coach.name)
@@ -71,6 +73,17 @@ export class SubscriptionsService {
     });
 
     await subscription.save();
+
+    // auto-send welcome message from client to coach
+    try {
+      await this.chatService.saveMessage(
+        clientId,
+        dto.coachId,
+        "Hi! I just subscribed to your coaching plan. Looking forward to getting started! 💪"
+      );
+    } catch (e) {
+      console.error('Failed to send auto message:', e);
+    }
 
     // add client to coach's client list
     await this.coachModel.findOneAndUpdate(

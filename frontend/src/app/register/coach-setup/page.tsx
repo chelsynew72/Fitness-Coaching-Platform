@@ -49,12 +49,15 @@ export default function CoachSetup() {
       });
 
       if (response.ok) {
-        alert("Profile created successfully!");
-        // Redirect to dashboard or next step
+        window.location.href = "/register/pending";
       } else {
         const error = await response.json();
-        console.error("Failed to create profile:", error);
-        alert("Failed to create profile. Check console for details.");
+        if (error.statusCode === 409) {
+          // Profile already exists, just redirect
+          window.location.href = "/register/pending";
+        } else {
+          alert(error.message || "Failed to create profile.");
+        }
       }
     } catch (error) {
       console.error("Error submitting profile:", error);

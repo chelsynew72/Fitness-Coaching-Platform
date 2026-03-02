@@ -35,6 +35,7 @@ export default function ClientChat() {
   const router = useRouter();
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [myCoach, setMyCoach] = useState<any>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [activeConv, setActiveConv] = useState<string | null>(null);
   const [activeUser, setActiveUser] = useState<any>(null);
@@ -50,6 +51,15 @@ export default function ClientChat() {
 
   const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
   const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4000";
+
+  const post = async (path: string, body: any) => {
+    const res = await fetch(`${API}/api${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(body),
+    });
+    return res.json();
+  };
 
   const get = async (path: string) => {
     const res = await fetch(`${API}/api${path}`, {
@@ -113,10 +123,37 @@ export default function ClientChat() {
   const fetchConversations = async () => {
     setLoading(true);
     try {
-      const data = await get("/chat/conversations");
-      setConversations(data);
+      const [convData, subData] = await Promise.allSettled([
+        get("/chat/conversations"),
+        get("/subscriptions/my"),
+      ]);
+      if (convData.status === "fulfilled") setConversations(convData.value);
+      if (subData.status === "fulfilled" && subData.value?.coachId) {
+        setMyCoach(subData.value.coachId);
+      }
     } catch {}
     finally { setLoading(false); }
+  };
+
+  const startChatWithCoach = async () => {
+    if (!myCoach) return;
+    // check if conversation already exists
+    const existing = conversations.find(c =>
+      c.senderId._id === myCoach._id || c.receiverId._id === myCoach._id
+    );
+    if (existing) {
+      openConversation(existing);
+      return;
+    }
+    // send a greeting to start the conversation
+    try {
+      await post(`/chat/${myCoach._id}`, { content: "Hi! I wanted to reach out." });
+      await fetchConversations();
+      setActiveUser(myCoach);
+      const msgs = await get(`/chat/${myCoach._id}`);
+      setMessages(msgs);
+      setActiveConv(`${user?.id}_${myCoach._id}`);
+    } catch {}
   };
 
   const fetchUnread = async () => {
@@ -278,37 +315,58 @@ export default function ClientChat() {
               <div className="p-4 space-y-3">
                 {[1, 2, 3].map(i => <div key={i} className="h-16 bg-zinc-900 rounded shimmer" />)}
               </div>
-            ) : conversations.length > 0 ? (
-              conversations.map((conv, i) => {
-                const other = conv.senderId._id === user?.id ? conv.receiverId : conv.senderId;
-                const isActive = activeConv === conv.conversationId;
-                return (
-                  <button key={i} onClick={() => openConversation(conv)}
-                    className={`w-full flex items-center gap-3 px-5 py-4 hover:bg-white/3 transition-colors border-b border-white/3 text-left ${
-                      isActive ? "bg-white/5" : ""
-                    }`}>
-                    <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center font-black text-sm shrink-0 relative">
-                      {other.name?.[0] || "?"}
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-primary rounded-full border-2 border-black" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <p className="text-sm font-bold truncate">{other.name}</p>
-                        <p className="text-[10px] text-zinc-600 shrink-0 ml-2">
-                          {formatTime(conv.createdAt)}
-                        </p>
-                      </div>
-                      <p className="text-xs text-zinc-600 truncate">{conv.content}</p>
-                    </div>
-                  </button>
-                );
-              })
             ) : (
-              <div className="flex flex-col items-center justify-center h-48 text-center px-6">
-                <MessageCircle className="h-8 w-8 text-zinc-700 mb-3" />
-                <p className="text-zinc-600 text-sm">No conversations yet</p>
-                <p className="text-zinc-700 text-xs mt-1">Your coach can message you here</p>
-              </div>
+              <>
+                {/* Coach contact */}
+                {myCoach && (
+                  <div className="px-4 pt-3 pb-1">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mb-2">Your Coach</p>
+                    <button onClick={startChatWithCoach}
+                      className="w-full flex items-center gap-3 px-3 py-3 bg-primary/5 border border-primary/20 rounded-xl hover:bg-primary/10 transition-colors text-left mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-black font-black text-sm shrink-0">
+                        {myCoach.name?.[0] || "C"}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-white">{myCoach.name}</p>
+                        <p className="text-[10px] text-primary">Tap to message</p>
+                      </div>
+                    </button>
+                  </div>
+                )}
+                {/* Existing conversations */}
+                {conversations.length > 0 && (
+                  <div className="px-4 pb-1">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mb-2">Recent</p>
+                  </div>
+                )}
+                {conversations.map((conv, i) => {
+                  const other = conv.senderId._id === user?.id ? conv.receiverId : conv.senderId;
+                  const isActive = activeConv === conv.conversationId;
+                  return (
+                    <button key={i} onClick={() => openConversation(conv)}
+                      className={`w-full flex items-center gap-3 px-5 py-4 hover:bg-white/3 transition-colors border-b border-white/3 text-left ${isActive ? "bg-white/5" : ""}`}>
+                      <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center font-black text-sm shrink-0 relative">
+                        {other.name?.[0] || "?"}
+                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-primary rounded-full border-2 border-black" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-0.5">
+                          <p className="text-sm font-bold truncate">{other.name}</p>
+                          <p className="text-[10px] text-zinc-600 shrink-0 ml-2">{formatTime(conv.createdAt)}</p>
+                        </div>
+                        <p className="text-xs text-zinc-600 truncate">{conv.content}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+                {!myCoach && conversations.length === 0 && (
+                  <div className="flex flex-col items-center justify-center h-48 text-center px-6">
+                    <MessageCircle className="h-8 w-8 text-zinc-700 mb-3" />
+                    <p className="text-zinc-600 text-sm">No conversations yet</p>
+                    <p className="text-zinc-700 text-xs mt-1">Subscribe to a coach to start chatting</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

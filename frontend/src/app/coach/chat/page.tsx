@@ -31,6 +31,7 @@ export default function CoachChat() {
   const router = useRouter();
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [clients, setClients] = useState<any[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [activeConv, setActiveConv] = useState<string | null>(null);
   const [activeUser, setActiveUser] = useState<any>(null);
@@ -46,6 +47,34 @@ export default function CoachChat() {
 
   const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
   const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4000";
+
+  const post = async (path: string, body: any) => {
+    const res = await fetch(`${API}/api${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(body),
+    });
+    return res.json();
+  };
+
+  const startChatWithClient = async (client: any) => {
+    const existing = conversations.find(c =>
+      c.senderId._id === client._id || c.receiverId._id === client._id
+    );
+    if (existing) {
+      openConversation(existing);
+      return;
+    }
+    try {
+      await post(`/chat/${client._id}`, { content: "Hi! How are you getting on with your training?" });
+      const data = await get("/chat/conversations");
+      setConversations(data);
+      setActiveUser(client);
+      const msgs = await get(`/chat/${client._id}`);
+      setMessages(msgs);
+      setActiveConv(`${user?.id}_${client._id}`);
+    } catch {}
+  };
 
   const get = async (path: string) => {
     const res = await fetch(`${API}/api${path}`, {
@@ -90,8 +119,12 @@ export default function CoachChat() {
   const fetchConversations = async () => {
     setLoading(true);
     try {
-      const data = await get("/chat/conversations");
-      setConversations(data);
+      const [convData, clientData] = await Promise.allSettled([
+        get("/chat/conversations"),
+        get("/coaches/my-clients"),
+      ]);
+      if (convData.status === "fulfilled") setConversations(convData.value);
+      if (clientData.status === "fulfilled") setClients(Array.isArray(clientData.value) ? clientData.value : []);
     } catch {}
     finally { setLoading(false); }
   };
@@ -238,32 +271,63 @@ export default function CoachChat() {
               <div className="p-4 space-y-3">
                 {[1, 2, 3].map(i => <div key={i} className="h-16 bg-zinc-900 rounded shimmer" />)}
               </div>
-            ) : conversations.length > 0 ? (
-              conversations.map((conv, i) => {
-                const other = conv.senderId._id === user?.id ? conv.receiverId : conv.senderId;
-                const isActive = activeConv === conv.conversationId;
-                return (
-                  <button key={i} onClick={() => openConversation(conv)}
-                    className={`w-full flex items-center gap-3 px-5 py-4 hover:bg-white/3 transition-colors border-b border-white/3 text-left ${isActive ? "bg-white/5" : ""}`}>
-                    <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center font-black text-sm shrink-0 relative">
-                      {other.name?.[0] || "?"}
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-primary rounded-full border-2 border-black" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <p className="text-sm font-bold truncate">{other.name}</p>
-                        <p className="text-[10px] text-zinc-600 shrink-0 ml-2">{formatTime(conv.createdAt)}</p>
-                      </div>
-                      <p className="text-xs text-zinc-600 truncate">{conv.content}</p>
-                    </div>
-                  </button>
-                );
-              })
             ) : (
-              <div className="flex flex-col items-center justify-center h-48 text-center px-6">
-                <MessageCircle className="h-8 w-8 text-zinc-700 mb-3" />
-                <p className="text-zinc-600 text-sm">No conversations yet</p>
-              </div>
+              <>
+                {/* Clients contacts */}
+                {clients.length > 0 && (
+                  <div className="px-4 pt-3 pb-1">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mb-2">Your Clients</p>
+                    {clients.map((client: any, i: number) => (
+                      <button key={i} onClick={() => startChatWithClient(client)}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors text-left mb-1">
+                        <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-black font-black text-sm shrink-0">
+                          {client.name?.[0] || "?"}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold truncate">{client.name}</p>
+                          <p className="text-[10px] text-zinc-600 truncate">{client.email}</p>
+                        </div>
+                        <MessageCircle className="h-4 w-4 text-zinc-600 shrink-0" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {/* Existing conversations */}
+                {conversations.length > 0 && (
+                  <>
+                    <div className="px-4 pt-2 pb-1 border-t border-white/5">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mb-1">Recent</p>
+                    </div>
+                    {conversations.map((conv, i) => {
+                      const other = conv.senderId._id === user?.id ? conv.receiverId : conv.senderId;
+                      const isActive = activeConv === conv.conversationId;
+                      return (
+                        <button key={i} onClick={() => openConversation(conv)}
+                          className={`w-full flex items-center gap-3 px-5 py-4 hover:bg-white/3 transition-colors border-b border-white/3 text-left ${isActive ? "bg-white/5" : ""}`}>
+                          <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center font-black text-sm shrink-0 relative">
+                            {other.name?.[0] || "?"}
+                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-primary rounded-full border-2 border-black" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-0.5">
+                              <p className="text-sm font-bold truncate">{other.name}</p>
+                              <p className="text-[10px] text-zinc-600 shrink-0 ml-2">{formatTime(conv.createdAt)}</p>
+                            </div>
+                            <p className="text-xs text-zinc-600 truncate">{conv.content}</p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </>
+                )}
+                {clients.length === 0 && conversations.length === 0 && (
+                  <div className="flex flex-col items-center justify-center h-48 text-center px-6">
+                    <MessageCircle className="h-8 w-8 text-zinc-700 mb-3" />
+                    <p className="text-zinc-600 text-sm">No clients yet</p>
+                    <p className="text-zinc-700 text-xs mt-1">Clients will appear here when they subscribe</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

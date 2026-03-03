@@ -125,7 +125,7 @@ export default function ClientChat() {
     try {
       const [convData, subData] = await Promise.allSettled([
         get("/chat/conversations"),
-        get("/subscriptions/my"),
+        get("/subscriptions/my-subscription"),
       ]);
       if (convData.status === "fulfilled") setConversations(convData.value);
       if (subData.status === "fulfilled" && subData.value?.coachId) {

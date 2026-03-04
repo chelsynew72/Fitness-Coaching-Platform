@@ -337,12 +337,12 @@ export default function ClientDashboard() {
                 </>
               ) : (
                 <div>
-                  <p className="text-sm text-zinc-600 mb-3">No active subscription</p>
+                  <p className="text-sm text-zinc-500 mb-4">No active subscription</p>
                   <button
                     onClick={() => router.push("/coaches")}
-                    className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-1"
+                    className="w-full bg-primary text-black text-xs font-black uppercase tracking-widest px-4 py-3 hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                   >
-                    Find a Coach <ChevronRight className="h-3 w-3" />
+                    Find a Coach <ChevronRight className="h-4 w-4" />
                   </button>
                 </div>
               )}
